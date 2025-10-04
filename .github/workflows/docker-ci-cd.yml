@@ -1,34 +1,36 @@
 name: CI/CD con Docker
+
 on:
- push:
-  branches: [ "main" ]
+  push:
+    branches: [ "main" ]
+
 jobs:
- build_and_push:
-  runs-on: ubuntu-latest
-  permissions:
-    contents: read
-    packages: write # Permiso para escribir en GitHub Packages
- steps:
-   - name: Clonar el repositorio
-     uses: actions/checkout@v4
+  build_and_push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Clonar el repositorio
+        uses: actions/checkout@v4
 
-   - name: Configurar metadatos de la imagen Docker
-     id: meta
-     uses: docker/metadata-action@v5
-     with:
-      images: ghcr.io/${{ github.repository }}
+      - name: Configurar metadatos de la imagen Docker
+        id: meta
+        uses: docker/metadata-action@v5
+        with:
+          images: ghcr.io/${{ github.repository }}
 
-   - name: Iniciar sesión en GitHub Container Registry
-     uses: docker/login-action@v3
-     with:
-      registry: ghcr.io
-      username: ${{ github.actor }}
-      password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Iniciar sesión en GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
-   - name: Construir y publicar la imagen Docker
-     uses: docker/build-push-action@v5
-     with:
-      context: .
-      push: true
-      tags: ${{ steps.meta.outputs.tags }}
-      labels: ${{ steps.meta.outputs.labels }}
+      - name: Construir y publicar la imagen Docker
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: true
+          tags: ${{ steps.meta.outputs.tags }}
+          labels: ${{ steps.meta.outputs.labels }}
